@@ -69,9 +69,15 @@ if ($SkipDownload) {
   }
 }
 
-Write-Info "Creating ZIP: $zipPath"
+Write-Info "Creating ZIP (Fastest): $zipPath"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
-Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
+try {
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  [IO.Compression.ZipFile]::CreateFromDirectory($outDir, $zipPath, [IO.Compression.CompressionLevel]::Fastest, $false)
+} catch {
+  Write-Err "ZipFile API failed: $($_.Exception.Message). Falling back to Compress-Archive."
+  Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
+}
 
 Write-Info "Done. ZIP at: $zipPath"
 Write-Output $zipPath
