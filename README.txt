@@ -60,6 +60,12 @@ Example Requests
 3) URL JSON:
    curl -H "Content-Type: application/json" -d "{\"url\":\"https://your.host/audio.wav\"}" http://localhost:8000/v1/audio/transcriptions/url
 
+Packaging via script
+- From repo root, run:
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base
+- Output: .\WhisperServer.zip (includes published EXE, config.json, and attempts to pre-download the model)
+- If model pre-download fails due to network, run locally after unzip: .\WhisperAPI.exe --download whisper-base
+
 Publishing a Portable ZIP (build step for maintainers)
 1) Publish a single-file EXE (self-contained):
    dotnet publish src/WhisperAPI -c Release -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -o .\artifacts
@@ -78,4 +84,3 @@ Notes
 - Models are large (100MB–1.5GB). They are not embedded in the EXE by design.
 - Logs rotate at 10MB. Inspect logs\whisper-server.log for troubleshooting.
 - For production install scenarios, consider using ProgramData for config/models/logs.
-
