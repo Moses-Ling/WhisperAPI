@@ -1,0 +1,24 @@
+# Visual Studio / .NET
+.vs/
+*.user
+*.suo
+*.userprefs
+
+# Build output
+bin/
+obj/
+
+# Artifacts and published output
+artifacts/
+artifacts_fd/
+WhisperServer.zip
+
+# Logs and models (do not commit large files)
+src/WhisperAPI/logs/
+src/WhisperAPI/models/
+
+# OS junk
+Thumbs.db
+Desktop.ini
+.DS_Store
+

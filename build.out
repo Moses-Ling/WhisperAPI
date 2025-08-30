@@ -1,0 +1,12 @@
+  Determining projects to restore...
+  All projects are up-to-date for restore.
+D:\VS\source\repos\Whisper.net\src\WhisperAPI\Services\WhisperTranscriber.cs(72,24): warning CS8601: Possible null reference assignment. [D:\VS\source\repos\Whisper.net\src\WhisperAPI\WhisperAPI.csproj]
+  WhisperAPI -> D:\VS\source\repos\Whisper.net\src\WhisperAPI\bin\Release\net8.0\WhisperAPI.dll
+
+Build succeeded.
+
+D:\VS\source\repos\Whisper.net\src\WhisperAPI\Services\WhisperTranscriber.cs(72,24): warning CS8601: Possible null reference assignment. [D:\VS\source\repos\Whisper.net\src\WhisperAPI\WhisperAPI.csproj]
+    1 Warning(s)
+    0 Error(s)
+
+Time Elapsed 00:00:02.25

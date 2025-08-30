@@ -1,0 +1,113 @@
+{
+  "server": {
+    "host": "localhost",
+    "port": 8000,
+    "max_connections": 100,
+    "timeout_seconds": 300,
+    "enable_cors": true,
+    "static_files_path": "wwwroot"
+  },
+  "whisper": {
+    "model_name": "base",
+    "models_directory": "models", 
+    "language": "en",
+    "temperature": 0.01,
+    "max_new_tokens": 384,
+    "chunk_length_seconds": 25,
+    "batch_size": 8,
+    "return_timestamps": false,
+    "enable_vad": true,
+    "vad_threshold": 0.5
+  },
+  "audio": {
+    "max_file_size_mb": 100,
+    "supported_formats": ["wav", "mp3", "m4a", "flac", "ogg"],
+    "sample_rate": 16000,
+    "normalization_level": -0.55,
+    "preprocessing": {
+      "enable_noise_reduction": false,
+      "enable_silence_removal": true,
+      "silence_threshold": -40
+    }
+  },
+  "performance": {
+    "device": "auto",
+    "gpu_memory_fraction": 0.8,
+    "enable_flash_attention": true,
+    "max_concurrent_requests": 4,
+    "queue_size": 10
+  },
+  "logging": {
+    "level": "Information",
+    "file_path": "logs/whisper-server.log",
+    "max_file_size_mb": 50,
+    "max_files": 10,
+    "enable_console": true,
+    "enable_performance_metrics": true
+  },
+  "history": {
+    "enabled": true,
+    "directory": "history",
+    "retention_days": 30,
+    "save_audio_files": false,
+    "compression": true
+  },
+  "security": {
+    "enable_api_key": false,
+    "api_key": "",
+    "rate_limiting": {
+      "enabled": false,
+      "requests_per_minute": 60,
+      "requests_per_hour": 1000
+    },
+    "allowed_origins": ["*"],
+    "max_request_size_mb": 100
+  },
+  "features": {
+    "enable_url_transcription": true,
+    "enable_base64_transcription": true,
+    "enable_local_file_transcription": true,
+    "enable_streaming": false,
+    "enable_translation": true,
+    "enable_speaker_diarization": false
+  }
+}
+
+// Alternative YAML format (more readable for complex configs)
+# whisper-config.yaml
+server:
+  host: localhost
+  port: 8000
+  max_connections: 100
+  timeout_seconds: 300
+  enable_cors: true
+
+whisper:
+  model_name: base
+  models_directory: models
+  language: en
+  temperature: 0.01
+  max_new_tokens: 384
+  chunk_length_seconds: 25
+  return_timestamps: false
+
+audio:
+  max_file_size_mb: 100
+  supported_formats: [wav, mp3, m4a, flac, ogg]
+  sample_rate: 16000
+  
+performance:
+  device: auto  # auto, cpu, cuda, cuda:0, cuda:1
+  gpu_memory_fraction: 0.8
+  enable_flash_attention: true
+  max_concurrent_requests: 4
+
+logging:
+  level: Information
+  file_path: logs/whisper-server.log
+  enable_console: true
+
+history:
+  enabled: true
+  directory: history
+  retention_days: 30
