@@ -87,26 +87,14 @@ try {
   foreach ($p in $procs) { Write-Info "Stopping running process $($p.ProcessId) from output folder"; Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue }
 } catch {}
 
-Write-Info "Creating ZIP (tar -a, fastest): $zipPath"
+Write-Info "Creating ZIP (ZipFile Fastest): $zipPath"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 try {
-  $tar = Get-Command tar -ErrorAction SilentlyContinue
-  if ($tar) {
-    Push-Location $outDir
-    tar -a -c -f $zipPath -C $outDir .
-    Pop-Location
-  } else {
-    throw 'tar not available'
-  }
+  Add-Type -AssemblyName System.IO.Compression.FileSystem
+  [IO.Compression.ZipFile]::CreateFromDirectory($outDir, $zipPath, [IO.Compression.CompressionLevel]::Fastest, $false)
 } catch {
-  Write-Err "tar failed or not available: $($_.Exception.Message). Falling back to ZipFile API."
-  try {
-    Add-Type -AssemblyName System.IO.Compression.FileSystem
-    [IO.Compression.ZipFile]::CreateFromDirectory($outDir, $zipPath, [IO.Compression.CompressionLevel]::Fastest, $false)
-  } catch {
-    Write-Err "ZipFile API failed: $($_.Exception.Message). Falling back to Compress-Archive."
-    Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
-  }
+  Write-Err "ZipFile API failed: $($_.Exception.Message). Falling back to Compress-Archive."
+  Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
 }
 
 Write-Info "Done. ZIP at: $zipPath"

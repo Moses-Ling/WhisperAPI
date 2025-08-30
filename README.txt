@@ -63,7 +63,7 @@ Example Requests
 Packaging via script
 - From repo root, run:
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base
-- Output: .\WhisperServer.zip (includes published EXE, config.json, and attempts to pre-download the model)
+ - Output: .\WhisperServer.zip (includes published EXE, config.json, and attempts to pre-download the model)
 - If model pre-download fails due to network, run locally after unzip: .\WhisperAPI.exe --download whisper-base
 - To skip the model download during packaging: add -SkipDownload
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base -SkipDownload
