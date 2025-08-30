@@ -65,14 +65,17 @@ Packaging via script
   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base
 - Output: .\WhisperServer.zip (includes published EXE, config.json, and attempts to pre-download the model)
 - If model pre-download fails due to network, run locally after unzip: .\WhisperAPI.exe --download whisper-base
- - To skip the model download during packaging: add -SkipDownload
-   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base -SkipDownload
+- To skip the model download during packaging: add -SkipDownload
+  powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base -SkipDownload
+ - To package offline with a local model file: add -ImportModel
+   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base -ImportModel D:\Downloads\whisper-base.bin
 
 One-click packaging
 - Double-click `pack.cmd` in the repo root, or run:
   pack.cmd -Model whisper-base
   (Arguments are forwarded to `tools\pack.ps1`)
- - Example to skip pre-download: pack.cmd -Model whisper-base -SkipDownload
+- Example to skip pre-download: pack.cmd -Model whisper-base -SkipDownload
+ - Example to import local model: pack.cmd -Model whisper-base -ImportModel D:\Downloads\whisper-base.bin
 
 Publishing a Portable ZIP (build step for maintainers)
 1) Publish a single-file EXE (self-contained):

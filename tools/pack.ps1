@@ -7,11 +7,13 @@
 #   -Model         Model id to pre-download (whisper-base | whisper-small | whisper-medium | whisper-large-v3)
 #   -ForceConfig   Overwrite existing config.json in output folder
 #   -SkipDownload  Skip model pre-download (users download on first run)
+#   -ImportModel   Path to a local model .bin to include (offline); copied to models as <Model>.bin when -Model is provided
 
 Param(
     [string]$Model = "whisper-base",
     [switch]$ForceConfig,
-    [switch]$SkipDownload
+    [switch]$SkipDownload,
+    [string]$ImportModel
 )
 
 Set-StrictMode -Version Latest
@@ -55,9 +57,19 @@ if ($ForceConfig -or -not (Test-Path $cfgPath)) {
   Write-Info "Keeping existing config.json"
 }
 
+# Offline import (if provided)
+if ($ImportModel) {
+  $modelsDir = Join-Path $outDir 'models'
+  if (!(Test-Path $modelsDir)) { New-Item -ItemType Directory -Path $modelsDir | Out-Null }
+  $targetName = if ($Model) { "$Model.bin" } else { [IO.Path]::GetFileName($ImportModel) }
+  $targetPath = Join-Path $modelsDir $targetName
+  Write-Info "Importing local model: $ImportModel -> $targetPath"
+  Copy-Item -LiteralPath $ImportModel -Destination $targetPath -Force
+}
+
 if ($SkipDownload) {
   Write-Info "Skipping model pre-download (requested). Users can run: .\\WhisperAPI.exe --download $Model"
-} else {
+} elseif (-not $ImportModel) {
   Write-Info "Pre-downloading model: $Model"
   Push-Location $outDir
   & $exe --download $Model
@@ -69,14 +81,32 @@ if ($SkipDownload) {
   }
 }
 
-Write-Info "Creating ZIP (Fastest): $zipPath"
+# Best-effort: stop any running WhisperAPI.exe from output dir to avoid file locks during zip
+try {
+  $procs = Get-CimInstance Win32_Process | Where-Object { $_.CommandLine -like "*artifacts_fd*WhisperAPI.exe*" }
+  foreach ($p in $procs) { Write-Info "Stopping running process $($p.ProcessId) from output folder"; Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue }
+} catch {}
+
+Write-Info "Creating ZIP (tar -a, fastest): $zipPath"
 if (Test-Path $zipPath) { Remove-Item $zipPath -Force }
 try {
-  Add-Type -AssemblyName System.IO.Compression.FileSystem
-  [IO.Compression.ZipFile]::CreateFromDirectory($outDir, $zipPath, [IO.Compression.CompressionLevel]::Fastest, $false)
+  $tar = Get-Command tar -ErrorAction SilentlyContinue
+  if ($tar) {
+    Push-Location $outDir
+    tar -a -c -f $zipPath -C $outDir .
+    Pop-Location
+  } else {
+    throw 'tar not available'
+  }
 } catch {
-  Write-Err "ZipFile API failed: $($_.Exception.Message). Falling back to Compress-Archive."
-  Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
+  Write-Err "tar failed or not available: $($_.Exception.Message). Falling back to ZipFile API."
+  try {
+    Add-Type -AssemblyName System.IO.Compression.FileSystem
+    [IO.Compression.ZipFile]::CreateFromDirectory($outDir, $zipPath, [IO.Compression.CompressionLevel]::Fastest, $false)
+  } catch {
+    Write-Err "ZipFile API failed: $($_.Exception.Message). Falling back to Compress-Archive."
+    Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
+  }
 }
 
 Write-Info "Done. ZIP at: $zipPath"
