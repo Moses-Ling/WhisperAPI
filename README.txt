@@ -66,6 +66,11 @@ Packaging via script
 - Output: .\WhisperServer.zip (includes published EXE, config.json, and attempts to pre-download the model)
 - If model pre-download fails due to network, run locally after unzip: .\WhisperAPI.exe --download whisper-base
 
+One-click packaging
+- Double-click `pack.cmd` in the repo root, or run:
+  pack.cmd -Model whisper-base
+  (Arguments are forwarded to `tools\pack.ps1`)
+
 Publishing a Portable ZIP (build step for maintainers)
 1) Publish a single-file EXE (self-contained):
    dotnet publish src/WhisperAPI -c Release -r win-x64 -p:PublishSingleFile=true -p:PublishTrimmed=false -p:IncludeNativeLibrariesForSelfExtract=true -o .\artifacts

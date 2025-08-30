@@ -1,3 +1,12 @@
+# Whisper API Server packaging helper
+#
+# Usage (from repo root):
+#   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base
+#
+# Params:
+#   -Model        Model id to pre-download (whisper-base | whisper-small | whisper-medium | whisper-large-v3)
+#   -ForceConfig  Overwrite existing config.json in output folder
+
 Param(
     [string]$Model = "whisper-base",
     [switch]$ForceConfig
@@ -60,4 +69,3 @@ Compress-Archive -Path (Join-Path $outDir '*') -DestinationPath $zipPath -Force
 
 Write-Info "Done. ZIP at: $zipPath"
 Write-Output $zipPath
-
