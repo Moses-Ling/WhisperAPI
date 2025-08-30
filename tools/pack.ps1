@@ -4,12 +4,14 @@
 #   powershell -NoProfile -ExecutionPolicy Bypass -File .\tools\pack.ps1 -Model whisper-base
 #
 # Params:
-#   -Model        Model id to pre-download (whisper-base | whisper-small | whisper-medium | whisper-large-v3)
-#   -ForceConfig  Overwrite existing config.json in output folder
+#   -Model         Model id to pre-download (whisper-base | whisper-small | whisper-medium | whisper-large-v3)
+#   -ForceConfig   Overwrite existing config.json in output folder
+#   -SkipDownload  Skip model pre-download (users download on first run)
 
 Param(
     [string]$Model = "whisper-base",
-    [switch]$ForceConfig
+    [switch]$ForceConfig,
+    [switch]$SkipDownload
 )
 
 Set-StrictMode -Version Latest
@@ -53,14 +55,18 @@ if ($ForceConfig -or -not (Test-Path $cfgPath)) {
   Write-Info "Keeping existing config.json"
 }
 
-Write-Info "Pre-downloading model: $Model"
-Push-Location $outDir
-& $exe --download $Model
-$code = $LASTEXITCODE
-Pop-Location
-if ($code -ne 0) {
-  Write-Err "Model pre-download failed with exit code $code"
-  Write-Host "You can run manually: `"$exe --download $Model`""
+if ($SkipDownload) {
+  Write-Info "Skipping model pre-download (requested). Users can run: .\\WhisperAPI.exe --download $Model"
+} else {
+  Write-Info "Pre-downloading model: $Model"
+  Push-Location $outDir
+  & $exe --download $Model
+  $code = $LASTEXITCODE
+  Pop-Location
+  if ($code -ne 0) {
+    Write-Err "Model pre-download failed with exit code $code"
+    Write-Host "You can run manually after unzip: .\\WhisperAPI.exe --download $Model"
+  }
 }
 
 Write-Info "Creating ZIP: $zipPath"
