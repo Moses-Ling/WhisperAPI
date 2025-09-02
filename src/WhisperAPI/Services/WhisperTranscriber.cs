@@ -41,7 +41,7 @@ public sealed class WhisperTranscriber
         if (_factory is null) await InitializeAsync(ct);
         if (_factory is null) throw new InvalidOperationException("Whisper factory not initialized");
 
-        using var processor = _factory.CreateBuilder()
+        await using var processor = _factory.CreateBuilder()
             .WithLanguage(_config.Whisper.Language ?? "auto")
             .Build();
 
